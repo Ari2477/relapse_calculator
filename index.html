@@ -2,32 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 📌 Very important for mobile -->
 <title>calculator</title>
 
 <style>
 	body {
-		display:flex;justify-content:center;align-items:center;
-		height:100vh;background:#0f0f12;font-family:Arial,sans-serif;color:white;
+		margin:0;
+		background:#0f0f12;
+		font-family:Arial,sans-serif;
+		color:white;
+		display:flex;
+		justify-content:center;
+		align-items:center;
+		height:100dvh; /* better for phones */
 	}
+
 	.calculator {
-		background:#1a1c22;border-radius:20px;padding:25px;width:300px;
-		box-shadow:0 0 25px rgba(0,0,0,0.5);display:grid;grid-template-rows:auto 1fr;
+		width:90vw;               /* 📌 instead of fixed 300px */
+		max-width:360px;          /* but capped para hindi sobrang laki */
+		background:#1a1c22;
+		border-radius:18px;
+		padding:22px;
+		box-shadow:0 0 30px rgba(0,0,0,0.6);
+		display:grid;
+		gap:15px;
 	}
+
 	.display {
-		background:#2a2d34;padding:15px;border-radius:10px;text-align:right;
-		font-size:1.2rem;margin-bottom:15px;min-height:40px;display:flex;
-		align-items:center;justify-content:flex-end;color:#e6e6e6;
+		background:#25272e;
+		padding:12px;
+		border-radius:10px;
+		font-size:1.4rem;        /* mas malaki sa phone */
+		min-height:55px;
+		display:flex;
+		align-items:center;
+		justify-content:flex-end;
+		color:#f2f2f2;
 	}
-	.buttons {display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+
+	.buttons {
+		display:grid;
+		grid-template-columns:repeat(4,1fr);
+		gap:10px;
+	}
+
 	button {
-		padding:15px;font-size:1.2rem;border:none;border-radius:10px;cursor:pointer;
-		background:#3b3e45;color:white;transition:0.2s;
+		padding:15px;
+		font-size:1.4rem;
+		border:none;
+		border-radius:12px;
+		background:#3b3e45;
+		color:#fff;
+		transition:.2s;
 	}
-	button:hover {background:#575a64;}
-	.equals {background:#34d399 !important;}
-	.equals:hover {background:#10b981;}
-	.reset {background:#ef4444 !important;}
-	.reset:hover {background:#dc2626;}
+
+	button:active { transform:scale(.94);} /* phone tap feedback */
+
+	.equals {background:#34d399!important;}
+	.reset {background:#ef4444!important;}
 </style>
 </head>
 
@@ -35,57 +67,58 @@
 
 <div class="calculator">
 	<div class="display" id="display"></div>
+
 	<div class="buttons">
-		<button>7</button><button>8</button><button>9</button><button class="reset">−</button>
+		<button>7</button><button>8</button><button>9</button><button class="reset">C</button>
 		<button>4</button><button>5</button><button>6</button><button>/</button>
 		<button>1</button><button>2</button><button>3</button><button>*</button>
 		<button>0</button><button>.</button><button class="equals">=</button><button>+</button>
 	</div>
 </div>
 
-<!-- 🎵 Replace with your audio file (music/music.mp3) -->
-<audio id="music" src="music/snaptik_7341969002148695302_v2.mp3"></audio>
+<!-- 🔥 pangalan ng file dapat eksakto ganito -->
+<audio id="music" src="music.mp3"></audio>
 
 <script>
 	let display = document.getElementById("display");
-	let buttons = document.querySelectorAll("button");
 	let music = document.getElementById("music");
 	let phraseTimeouts = [];
 
-	/* ✍ ADD phrases dito — format: ["text", duration(ms)] */
 	let phrases = [
 		["i miss you :((", 2500],
 	];
 
-	buttons.forEach(btn => {
-		btn.addEventListener("click", () => {
-			if (btn.classList.contains("equals")) startPhraseCycle();
-			else if (btn.classList.contains("reset")) resetDisplay();
+	document.querySelectorAll("button").forEach(btn=>{
+		btn.addEventListener("click",()=>{
+			if(btn.classList.contains("equals")) playSequence();
+			else if(btn.classList.contains("reset")) resetAll();
 			else display.textContent += btn.textContent;
 		});
 	});
 
-	function startPhraseCycle(){
-		resetDisplay();
-		music.currentTime = 0;
-		music.play();
+	function playSequence(){
+		resetAll();
 
-		let delay = 0;
+		// 📌 Trick para pinapayagan ng mobile autoplay
+		music.volume = 1.0;
+		music.play().catch(()=>{ 
+			alert("Tap screen once then press = again para tumugtog");
+		});
+
+		let delay=0;
 		phrases.forEach(([text,time])=>{
-			let t = setTimeout(()=>{
-				display.textContent = text;
-			}, delay);
+			let t=setTimeout(()=>display.textContent=text,delay);
 			phraseTimeouts.push(t);
-			delay += time;
+			delay+=time;
 		});
 	}
 
-	function resetDisplay(){
+	function resetAll(){
 		phraseTimeouts.forEach(t=>clearTimeout(t));
-		phraseTimeouts = [];
-		display.textContent = "";
+		phraseTimeouts=[];
+		display.textContent="";
 		music.pause();
-		music.currentTime = 0;
+		music.currentTime=0;
 	}
 </script>
 
