@@ -3,45 +3,75 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>calculator</title>
+<title>Sad Calculator</title>
 
 <style>
 	body {
-		margin:0;background:#0f0f12;font-family:Arial,sans-serif;color:white;
-		display:flex;justify-content:center;align-items:center;height:100dvh;overflow:hidden;
+		margin:0;
+		background:#05070c; 
+		font-family: "Poppins", sans-serif;
+		color:white;
+		display:flex;justify-content:center;align-items:center;
+		height:100dvh;overflow:hidden;
+		background-image:radial-gradient(circle at 50% 80%, #1a1c22 5%, #05070c 80%);
 	}
 
 	.calculator {
-		width:90vw;max-width:360px;background:#1a1c22;border-radius:18px;padding:22px;
-		box-shadow:0 0 30px rgba(0,0,0,.6);display:grid;gap:15px;
+		width:90vw;max-width:360px;
+		background:rgba(20,22,28,0.85);
+		border-radius:20px;
+		padding:24px;
+		box-shadow:0 0 60px rgba(0,0,0,0.65);
+		backdrop-filter:blur(8px);
+		display:grid;gap:18px;
+		animation:fadeIn 1.4s ease;
 	}
 
-	.display {
-		background:#25272e;padding:12px;border-radius:10px;font-size:1.4rem;
-		min-height:55px;display:flex;align-items:center;justify-content:flex-end;color:#f2f2f2;
-		transition:.4s;text-align:right;
+	@keyframes fadeIn {
+		from{opacity:0;transform:translateY(20px);}
+		to{opacity:1;}
+	}
+	
+	.display{
+		background:rgba(255,255,255,0.06);
+		border:1px solid rgba(255,255,255,0.07);
+		padding:14px;font-size:1.45rem;text-align:center;
+		min-height:70px;border-radius:14px;
+		color:#eaeaea;letter-spacing:.5px;
+		display:flex;justify-content:center;align-items:center;
+		overflow:hidden; 
 	}
 
-	/* ❤️ beat animation while lyrics play */
-	.beat{animation:heartbeat 1.2s infinite;}
-	@keyframes heartbeat{
-		0%{transform:scale(1);}
-		50%{transform:scale(1.15);}
-		100%{transform:scale(1);}
+	.lyric-animate {
+		animation: lyricFade 1.25s ease forwards;
+		opacity:0;
 	}
 
-	.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-	button{padding:15px;font-size:1.4rem;border:none;border-radius:12px;background:#3b3e45;color:#fff;transition:.2s;}
-	button:active{transform:scale(.92);}
-	.equals{background:#34d399!important;}
-	.reset{background:#ef4444!important;}
+	@keyframes lyricFade {
+		0% {opacity:0; transform:translateY(12px) scale(.95);}
+		50% {opacity:.6;}
+		100% {opacity:1; transform:translateY(0) scale(1);}
+	}
+
+	.buttons{
+		display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+	}
+
+	button{
+		padding:16px;font-size:1.4rem;border:none;border-radius:12px;
+		background:#2e3138;color:white;
+		transition:.25s;
+	}
+	button:active{transform:scale(.93);}
+	.equals{background:#3ad59b!important;box-shadow:0 0 10px #3ad59b80;}
+	.reset{background:#e95656!important;}
 </style>
 </head>
 
 <body>
 
 <div class="calculator">
-	<div class="display" id="display"></div>
+	<div class="display" id="display">‎</div>
 
 	<div class="buttons">
 		<button>7</button><button>8</button><button>9</button><button class="reset">C</button>
@@ -54,9 +84,9 @@
 <audio id="music" src="snaptik_7341969002148695302_v2.mp3"></audio>
 
 <script>
-	let display=document.getElementById("display");
-	let music=document.getElementById("music");
-	let phraseTimeouts=[];
+	let display = document.getElementById("display");
+	let music = document.getElementById("music");
+	let timeouts = [];
 
 	let phrases=[
 		["NAKATANIM",4000],
@@ -76,30 +106,31 @@
 
 	document.querySelectorAll("button").forEach(btn=>{
 		btn.onclick=()=>{
-			if(btn.classList.contains("equals")) runLyrics();
-			else if(btn.classList.contains("reset")) resetAll();
+			if(btn.classList.contains("equals")) playLyrics();
+			else if(btn.classList.contains("reset")) resetCalc();
 			else display.textContent+=btn.textContent;
-		};
-	});
+		}
+	})
 
-	function runLyrics(){
-		resetAll();
+	function playLyrics(){
+		resetCalc();
 		music.currentTime=0;
-		music.play().catch(()=>alert("Tap screen once then press '=' ulit."));
-		display.classList.add("beat");
-
+		music.play().catch(()=>alert("Tap screen then press = ulit"));
+		
 		let delay=0;
 		phrases.forEach(([txt,time])=>{
-			let t=setTimeout(()=>display.textContent=txt,delay);
-			phraseTimeouts.push(t);delay+=time;
+			let t=setTimeout(()=>{
+				display.innerHTML=`<span class="lyric-animate">${txt}</span>`;
+			},delay);
+			timeouts.push(t);
+			delay+=time;
 		});
 	}
 
-	function resetAll(){
-		phraseTimeouts.forEach(t=>clearTimeout(t));
-		phraseTimeouts=[];
-		display.textContent="";
-		display.classList.remove("beat");
+	function resetCalc(){
+		timeouts.forEach(t=>clearTimeout(t));
+		timeouts=[];
+		display.textContent="‎";
 		music.pause();music.currentTime=0;
 	}
 </script>
