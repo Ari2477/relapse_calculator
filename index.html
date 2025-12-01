@@ -7,71 +7,34 @@
 
 <style>
 	body {
-		margin:0;
-		background:#0f0f12;
-		font-family:Arial,sans-serif;
-		color:white;
-		display:flex;
-		justify-content:center;
-		align-items:center;
-		height:100dvh;
-		overflow:hidden;
+		margin:0;background:#0f0f12;font-family:Arial,sans-serif;color:white;
+		display:flex;justify-content:center;align-items:center;height:100dvh;overflow:hidden;
 	}
 
 	.calculator {
-		width:90vw;
-		max-width:360px;
-		background:#1a1c22;
-		border-radius:18px;
-		padding:22px;
-		box-shadow:0 0 30px rgba(0,0,0,.6);
-		display:grid;
-		gap:15px;
-		transform:scale(.96);
+		width:90vw;max-width:360px;background:#1a1c22;border-radius:18px;padding:22px;
+		box-shadow:0 0 30px rgba(0,0,0,.6);display:grid;gap:15px;
 	}
 
 	.display {
-		background:#25272e;
-		padding:12px;
-		border-radius:10px;
-		font-size:1.4rem;
-		min-height:55px;
-		display:flex;
-		align-items:center;
-		justify-content:flex-end;
-		color:#f2f2f2;
-		transition:.4s;
+		background:#25272e;padding:12px;border-radius:10px;font-size:1.4rem;
+		min-height:55px;display:flex;align-items:center;justify-content:flex-end;color:#f2f2f2;
+		transition:.4s;text-align:right;
 	}
 
-	/* ❤️ beating animation */
-	.beat {
-		animation: heartbeat 1.1s infinite;
-	}
+	/* ❤️ beat animation while lyrics play */
+	.beat{animation:heartbeat 1.2s infinite;}
 	@keyframes heartbeat{
 		0%{transform:scale(1);}
-		50%{transform:scale(1.09);}
+		50%{transform:scale(1.15);}
 		100%{transform:scale(1);}
 	}
 
-	.buttons {
-		display:grid;
-		grid-template-columns:repeat(4,1fr);
-		gap:10px;
-	}
-
-	button {
-		padding:15px;
-		font-size:1.4rem;
-		border:none;
-		border-radius:12px;
-		background:#3b3e45;
-		color:#fff;
-		transition:.2s;
-	}
-	button:active {transform:scale(.94);}
-
-	.equals {background:#34d399!important;}
-	.reset {background:#ef4444!important;}
+	.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+	button{padding:15px;font-size:1.4rem;border:none;border-radius:12px;background:#3b3e45;color:#fff;transition:.2s;}
+	button:active{transform:scale(.92);}
+	.equals{background:#34d399!important;}
+	.reset{background:#ef4444!important;}
 </style>
 </head>
 
@@ -88,40 +51,46 @@
 	</div>
 </div>
 
-<audio id="music" src="snaptik_7341969002148695302_v2.mp3" loop></audio>
+<audio id="music" src="snaptik_7341969002148695302_v2.mp3"></audio>
 
 <script>
-	let display = document.getElementById("display");
-	let music = document.getElementById("music");
-	let phraseTimeouts = [];
+	let display=document.getElementById("display");
+	let music=document.getElementById("music");
+	let phraseTimeouts=[];
 
-	/* ✍ dito mo ilalagay lyrics/lines */
-	let phrases = [
-		["I MISS YOU :((", 2600],
-	
+	let phrases=[
+		["NAKATANIM",4000],
+		["PARIN",1000],
+		["ANG GUMAMELANG",2200],
+		["BINALIK",1700],
+		["MO SA ‘KIN",1200],
+		["NUNG TAYO‘Y",2000],
+		["MAG HIWALAYYY",3100],
+		["ITO‘Y KATULAD",2900],
+		["NG DAMDAMIN KO",2400],
+		["KAHIT BUHOSAN MO",2400],
+		["NG BEER AYAW PANG",2600],
+		["MAMATAYYYY",3000]
 	];
 
 	document.querySelectorAll("button").forEach(btn=>{
-		btn.addEventListener("click",()=>{
-			if(btn.classList.contains("equals")) runSequence();
+		btn.onclick=()=>{
+			if(btn.classList.contains("equals")) runLyrics();
 			else if(btn.classList.contains("reset")) resetAll();
-			else display.textContent += btn.textContent;
-		});
+			else display.textContent+=btn.textContent;
+		};
 	});
 
-	function runSequence(){
+	function runLyrics(){
 		resetAll();
-
-
-		music.play().catch(()=>alert("Tap screen once then press = ulit para tumugtog"));
-
+		music.currentTime=0;
+		music.play().catch(()=>alert("Tap screen once then press '=' ulit."));
 		display.classList.add("beat");
 
 		let delay=0;
 		phrases.forEach(([txt,time])=>{
 			let t=setTimeout(()=>display.textContent=txt,delay);
-			phraseTimeouts.push(t);
-			delay+=time;
+			phraseTimeouts.push(t);delay+=time;
 		});
 	}
 
@@ -130,7 +99,7 @@
 		phraseTimeouts=[];
 		display.textContent="";
 		display.classList.remove("beat");
-		music.pause(); music.currentTime=0;
+		music.pause();music.currentTime=0;
 	}
 </script>
 
