@@ -6,17 +6,26 @@
 <title>Calculator</title>
 
 <style>
-	body {
+	body{
 		margin:0;
 		background:#05070c; 
-		font-family: "Poppins", sans-serif;
+		font-family:"Poppins",sans-serif;
 		color:white;
 		display:flex;justify-content:center;align-items:center;
 		height:100dvh;overflow:hidden;
-		background-image:radial-gradient(circle at 50% 80%, #1a1c22 5%, #05070c 80%);
+		background-image:radial-gradient(circle at 50% 80%,#1a1c22 5%,#05070c 80%);
 	}
 
-	.calculator {
+	canvas{
+		position:fixed;
+		top:0;left:0;
+		width:100%;
+		height:100%;
+		pointer-events:none;
+		display:none;
+	}
+
+	.calculator{
 		width:90vw;max-width:360px;
 		background:rgba(20,22,28,0.85);
 		border-radius:20px;
@@ -25,9 +34,10 @@
 		backdrop-filter:blur(8px);
 		display:grid;gap:18px;
 		animation:fadeIn 1.4s ease;
+		position:relative;z-index:10;
 	}
 
-	@keyframes fadeIn {
+	@keyframes fadeIn{
 		from{opacity:0;transform:translateY(20px);}
 		to{opacity:1;}
 	}
@@ -39,28 +49,26 @@
 		min-height:70px;border-radius:14px;
 		color:#eaeaea;letter-spacing:.5px;
 		display:flex;justify-content:center;align-items:center;
-		overflow:hidden; 
+		overflow:hidden;
 	}
 
-	.lyric-animate {
-		animation: lyricFade 1.25s ease forwards;
+	.lyric-animate{
+		animation:lyricFade 1.25s ease forwards;
 		opacity:0;
 	}
 
-	@keyframes lyricFade {
-		0% {opacity:0; transform:translateY(12px) scale(.95);}
-		50% {opacity:.6;}
-		100% {opacity:1; transform:translateY(0) scale(1);}
+	@keyframes lyricFade{
+		0%{opacity:0;transform:translateY(12px) scale(.95);}
+		50%{opacity:.6;}
+		100%{opacity:1;transform:translateY(0) scale(1);}
 	}
 
 	.buttons{
 		display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
 	}
-
 	button{
 		padding:16px;font-size:1.4rem;border:none;border-radius:12px;
-		background:#2e3138;color:white;
-		transition:.25s;
+		background:#2e3138;color:white;transition:.25s;
 	}
 	button:active{transform:scale(.93);}
 	.equals{background:#3ad59b!important;box-shadow:0 0 10px #3ad59b80;}
@@ -69,6 +77,8 @@
 </head>
 
 <body>
+
+<canvas id="rainCanvas"></canvas> 
 
 <div class="calculator">
 	<div class="display" id="display">‎</div>
@@ -84,55 +94,96 @@
 <audio id="music" src="snaptik_7341969002148695302_v2.mp3"></audio>
 
 <script>
-	let display = document.getElementById("display");
-	let music = document.getElementById("music");
-	let timeouts = [];
+const canvas=document.getElementById("rainCanvas");
+const ctx=canvas.getContext("2d");
+let rainDrops=[];
+canvas.width=innerWidth;
+canvas.height=innerHeight;
 
-	let phrases=[
-		["NAKATANIM",4000],
-		["PARIN",1000],
-		["ANG GUMAMELANG",2200],
-		["BINALIK",1700],
-		["MO SA ‘KIN",1200],
-		["NANG TAYO‘Y...",2400],
-		["MAG HIWALAYYY",4400],
-		["ITO‘Y KATULAD",3400],
-		["NG DAMDAMIN KO",2900],
-		["KAHIT BUHOSAN MO",2400],
-		["NG BEER AYAW PANG",3500],
-		["MAMATAYYYY...",4100],
-		["I MISS YOU :((",3000]
-	];
-
-	document.querySelectorAll("button").forEach(btn=>{
-		btn.onclick=()=>{
-			if(btn.classList.contains("equals")) playLyrics();
-			else if(btn.classList.contains("reset")) resetCalc();
-			else display.textContent+=btn.textContent;
+class Rain{
+	constructor(){this.x=Math.random()*canvas.width;
+		this.y=Math.random()*canvas.height;
+		this.length=Math.random()*18+12;
+		this.speed=Math.random()*4+4;}
+	draw(){
+		ctx.beginPath();
+		ctx.strokeStyle="rgba(180,220,255,0.55)";
+		ctx.lineWidth=1;
+		ctx.moveTo(this.x,this.y);
+		ctx.lineTo(this.x,this.y+this.length);
+		ctx.stroke();
+	}
+	update(){
+		this.y+=this.speed;
+		if(this.y>canvas.height){
+			this.y=0;this.x=Math.random()*canvas.width;
 		}
-	})
-
-	function playLyrics(){
-		resetCalc();
-		music.currentTime=0;
-		music.play().catch(()=>alert("Tap screen then press = ulit"));
-		
-		let delay=0;
-		phrases.forEach(([txt,time])=>{
-			let t=setTimeout(()=>{
-				display.innerHTML=`<span class="lyric-animate">${txt}</span>`;
-			},delay);
-			timeouts.push(t);
-			delay+=time;
-		});
+		this.draw();
 	}
+}
 
-	function resetCalc(){
-		timeouts.forEach(t=>clearTimeout(t));
-		timeouts=[];
-		display.textContent="‎";
-		music.pause();music.currentTime=0;
+function startRain(){
+	canvas.style.display="block"; 
+	for(let i=0;i<150;i++) rainDrops.push(new Rain());
+	animateRain();
+}
+function animateRain(){
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	rainDrops.forEach(r=>r.update());
+	requestAnimationFrame(animateRain);
+}
+
+let display=document.getElementById("display");
+let music=document.getElementById("music");
+let timeouts=[];
+
+let phrases=[
+	["NAKATANIM",4000],
+	["PARIN",1000],
+	["ANG GUMAMELANG",2200],
+	["BINALIK",1700],
+	["MO SA ‘KIN",1200],
+	["NANG TAYO‘Y...",2400],
+	["MAG HIWALAYYY",4400],
+	["ITO‘Y KATULAD",3400],
+	["NG DAMDAMIN KO",2900],
+	["KAHIT BUHOSAN MO",2400],
+	["NG BEER AYAW PANG",3500],
+	["MAMATAYYYY...",4100],
+	["I MISS YOU :((",3000]
+];
+
+document.querySelectorAll("button").forEach(btn=>{
+	btn.onclick=()=>{
+		if(btn.classList.contains("equals")) playLyrics();
+		else if(btn.classList.contains("reset")) resetCalc();
+		else display.textContent+=btn.textContent;
 	}
+});
+
+function playLyrics(){
+	resetCalc();
+	startRain();
+	music.currentTime=0;
+	music.play().catch(()=>alert("Tap screen then press = "));
+
+	let delay=0;
+	phrases.forEach(([txt,time])=>{
+		let t=setTimeout(()=>{
+			display.innerHTML=`<span class="lyric-animate">${txt}</span>`;
+		},delay);
+		timeouts.push(t);
+		delay+=time;
+	});
+}
+
+function resetCalc(){
+	timeouts.forEach(t=>clearTimeout(t));
+	timeouts=[];
+	display.textContent="‎";
+	music.pause();music.currentTime=0;
+	canvas.style.display="none";
+}
 </script>
 
 </body>
