@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>relapse</title>
+
+<style>
+	body {
+		display:flex;justify-content:center;align-items:center;
+		height:100vh;background:#0f0f12;font-family:Arial,sans-serif;color:white;
+	}
+	.calculator {
+		background:#1a1c22;border-radius:20px;padding:25px;width:300px;
+		box-shadow:0 0 25px rgba(0,0,0,0.5);display:grid;grid-template-rows:auto 1fr;
+	}
+	.display {
+		background:#2a2d34;padding:15px;border-radius:10px;text-align:right;
+		font-size:1.2rem;margin-bottom:15px;min-height:40px;display:flex;
+		align-items:center;justify-content:flex-end;color:#e6e6e6;
+	}
+	.buttons {display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+	button {
+		padding:15px;font-size:1.2rem;border:none;border-radius:10px;cursor:pointer;
+		background:#3b3e45;color:white;transition:0.2s;
+	}
+	button:hover {background:#575a64;}
+	.equals {background:#34d399 !important;}
+	.equals:hover {background:#10b981;}
+	.reset {background:#ef4444 !important;}
+	.reset:hover {background:#dc2626;}
+</style>
+</head>
+
+<body>
+
+<div class="calculator">
+	<div class="display" id="display"></div>
+	<div class="buttons">
+		<button>7</button><button>8</button><button>9</button><button class="reset">−</button>
+		<button>4</button><button>5</button><button>6</button><button>/</button>
+		<button>1</button><button>2</button><button>3</button><button>*</button>
+		<button>0</button><button>.</button><button class="equals">=</button><button>+</button>
+	</div>
+</div>
+
+<!-- 🎵 Replace with your audio file (music/music.mp3) -->
+<audio id="music" src="music/music.mp3"></audio>
+
+<script>
+	let display = document.getElementById("display");
+	let buttons = document.querySelectorAll("button");
+	let music = document.getElementById("music");
+	let phraseTimeouts = [];
+
+	/* ✍ ADD phrases dito — format: ["text", duration(ms)] */
+	let phrases = [
+		["i miss you <3", 2500],
+	];
+
+	buttons.forEach(btn => {
+		btn.addEventListener("click", () => {
+			if (btn.classList.contains("equals")) startPhraseCycle();
+			else if (btn.classList.contains("reset")) resetDisplay();
+			else display.textContent += btn.textContent;
+		});
+	});
+
+	function startPhraseCycle(){
+		resetDisplay();
+		music.currentTime = 0;
+		music.play();
+
+		let delay = 0;
+		phrases.forEach(([text,time])=>{
+			let t = setTimeout(()=>{
+				display.textContent = text;
+			}, delay);
+			phraseTimeouts.push(t);
+			delay += time;
+		});
+	}
+
+	function resetDisplay(){
+		phraseTimeouts.forEach(t=>clearTimeout(t));
+		phraseTimeouts = [];
+		display.textContent = "";
+		music.pause();
+		music.currentTime = 0;
+	}
+</script>
+
+</body>
+</html>
